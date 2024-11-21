@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    username: postgres
+    password: mullen2906
+    url: jdbc:postgresql://localhost:5432/taskhive
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+taskhive:
+  jwt:
+    secret: ${JWT_SECRET:secret}
