@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Users implements UserDetails {
+public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -45,7 +45,7 @@ public class Users implements UserDetails {
     @ManyToMany(mappedBy = "collaborators")
     private List<Board> collaborativeBoards;
 
-    public Users(String name, String user, String email, String password, UserRole role) {
+    public UserEntity(String name, String user, String email, String password, UserRole role) {
         this.name = name;
         this.user = user;
         this.email = email;

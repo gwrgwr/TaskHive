@@ -1,8 +1,14 @@
 package com.example.taskhive.controllers;
 
+import com.example.taskhive.annotations.authorization.LoginAuthorizationAnnotation;
+import com.example.taskhive.annotations.authorization.RegisterAdminAuthorizationAnnotation;
+import com.example.taskhive.annotations.authorization.RegisterUserAuthorizationAnnotation;
 import com.example.taskhive.config.security.TokenService;
 import com.example.taskhive.domain.user.*;
 import com.example.taskhive.repositories.UserRepository;
+import com.example.taskhive.services.AuthorizationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,53 +22,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authorization", description = "Endpoint for connecting and registering users")
 public class AuthorizationController {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TokenService tokenService;
+    private AuthorizationService authorizationService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginAuthenticationDTO data) {
-        UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(data.user(), data.password());
-        Authentication auth = authenticationManager.authenticate(usernamePassword);
-        String token = tokenService.generateToken((Users) auth.getPrincipal());
-        Users user = (Users) auth.getPrincipal();
-        return ResponseEntity.ok(new LoginResponseDTO(token, user.getId(), user.getName(), user.getEmail(), user.getRole().toString()));
+    @LoginAuthorizationAnnotation
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginAuthenticationDTO data) {
+        return ResponseEntity.ok().body(authorizationService.login(data));
     }
 
     @PostMapping("admin/register")
-    public ResponseEntity registerAdmin(@RequestBody RegisterAuthenticationDTO data) {
-        if (userRepository.findUsersByUser(data.user()) != null) {
-            return ResponseEntity.badRequest().build();
+    @RegisterAdminAuthorizationAnnotation
+    public ResponseEntity<RegisterResponseDTO> registerAdmin(@RequestBody RegisterAuthenticationDTO data) {
+        try {
+            return ResponseEntity.ok().body(authorizationService.registerAdmin(data));
+        } catch (BadRequestException exception) {
+            throw new RuntimeException("Bad Request", exception);
         }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        Users user = new Users(data.name(), data.user(), data.email(), encryptedPassword, UserRole.ADMIN);
-        this.userRepository.save(user);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterAuthenticationDTO data) {
-        if (userRepository.findUsersByUser(data.user()) != null && userRepository.findUsersByEmail(data.email()) != null) {
-            return ResponseEntity.badRequest().build();
-        }
-        UserRole role;
+    @RegisterUserAuthorizationAnnotation
+    public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterAuthenticationDTO data) {
         try {
-            role = UserRole.valueOf(data.role().toUpperCase());
-            if (role == UserRole.ADMIN) {
-                return ResponseEntity.badRequest().body("Invalid role.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Invalid role.");
+            return ResponseEntity.ok().body(authorizationService.register(data));
+        } catch (BadRequestException exception) {
+            throw new RuntimeException("Bad Request", exception);
         }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        Users user = new Users(data.name(), data.user(), data.email(), encryptedPassword, role);
-        this.userRepository.save(user);
-        return ResponseEntity.ok(new RegisterResponseDTO(user));
     }
 }

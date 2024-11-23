@@ -2,7 +2,7 @@ package com.example.taskhive.domain.task;
 
 import com.example.taskhive.domain.attach.Attachment;
 import com.example.taskhive.domain.list.Lists;
-import com.example.taskhive.domain.user.Users;
+import com.example.taskhive.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "assignee_id")
-    private Users assignee;
+    private UserEntity assignee;
 
     @ManyToOne
     @JoinColumn(name = "list_id", nullable = false)

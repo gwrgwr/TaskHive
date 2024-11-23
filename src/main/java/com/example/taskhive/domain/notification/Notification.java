@@ -1,6 +1,6 @@
 package com.example.taskhive.domain.notification;
 
-import com.example.taskhive.domain.user.Users;
+import com.example.taskhive.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
-    private Users recipient;
+    private UserEntity recipient;
 
     private Boolean read = false;
 

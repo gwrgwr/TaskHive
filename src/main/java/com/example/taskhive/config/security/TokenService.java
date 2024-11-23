@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.taskhive.domain.user.Users;
+import com.example.taskhive.domain.user.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class TokenService {
         return algorithm;
     }
 
-    public String generateToken(Users user) {
+    public String generateToken(UserEntity user) {
         return JWT.create()
                 .withSubject(user.getUser())
                 .withIssuedAt(new Date())
@@ -34,13 +34,12 @@ public class TokenService {
                 .sign(getAlgorithm());
     }
 
-    // Valida o token JWT e retorna se é válido
     public boolean validateToken(String token, String username) {
         try {
             DecodedJWT decodedJWT = verifyToken(token);
             return decodedJWT.getSubject().equals(username) && !isTokenExpired(decodedJWT);
         } catch (JWTVerificationException e) {
-            return false; // Token inválido
+            return false;
         }
     }
 
