@@ -15,4 +15,8 @@ public class BoardService {
     public List<Board> getAllBoardsFromUser(String userId) {
         return repository.findAllByCreatedBy_Id(userId);
     }
+
+    public List<Board> getAllColoborationsFromUser(String userId) {
+        return repository.findByCollaborators_Id(userId);
+    }
 }

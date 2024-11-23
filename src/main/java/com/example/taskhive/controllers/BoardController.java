@@ -23,4 +23,9 @@ public class BoardController {
     public List<Board> getCreatedBoardsBy(@PathVariable String userId) {
         return service.getAllBoardsFromUser(userId);
     }
+
+    @GetMapping(value = "collaboratedBoards/{userId}")
+    public List<Board> getCollaboratedBoardsBy(@PathVariable String userId) {
+        return service.getAllColoborationsFromUser(userId);
+    }
 }

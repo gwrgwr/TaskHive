@@ -25,8 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authorization", description = "Endpoint for connecting and registering users")
 public class AuthorizationController {
 
-    @Autowired
-    private AuthorizationService authorizationService;
+    private final AuthorizationService authorizationService;
+
+    public AuthorizationController(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
 
     @PostMapping("/login")
     @LoginAuthorizationAnnotation

@@ -35,7 +35,7 @@ public class SecurityConfigurations {
     }
 
     @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy);
         return expressionHandler;
@@ -47,9 +47,9 @@ public class SecurityConfigurations {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
-                        .requestMatchers("api/v1/auth/admin/register", "/api/v1/user/admin/login").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/auth/admin/register", "/api/v1/user/admin/login").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/staff").hasRole("STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/v1/user").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/guest").hasRole("GUEST")
