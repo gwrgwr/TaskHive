@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "notification_id")
     private String id;
 
     private String message;

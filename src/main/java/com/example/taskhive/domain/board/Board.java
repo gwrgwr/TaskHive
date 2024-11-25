@@ -6,22 +6,27 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "board_id")
     private String id;
 
     private String name;
 
     private String description;
+
+    private String accessCode = "";
 
     @ManyToOne
     @JoinColumn(name = "created_by_id", nullable = false)
@@ -38,5 +43,13 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lists> lists;
 
+
     private LocalDateTime createdAt;
+
+    public Board(String name, String description, UserEntity user) {
+        this.name = name;
+        this.description = description;
+        this.createdBy = user;
+        this.createdAt = LocalDateTime.now();
+    }
 }

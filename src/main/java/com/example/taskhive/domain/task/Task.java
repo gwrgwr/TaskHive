@@ -19,6 +19,7 @@ import java.util.List;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "task_id")
     private String id;
 
     private String title;

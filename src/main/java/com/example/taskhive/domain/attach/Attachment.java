@@ -15,11 +15,15 @@ import java.time.LocalDateTime;
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "attachment_id")
     private String id;
 
     private String filename;
 
     private String url;
+
+    @Lob
+    private byte[] data;
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)

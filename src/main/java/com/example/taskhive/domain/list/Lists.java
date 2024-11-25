@@ -16,6 +16,7 @@ import java.util.List;
 public class Lists {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "list_id")
     private String id;
 
     private String name;

@@ -1,6 +1,7 @@
 package com.example.taskhive.domain.user;
 
 import com.example.taskhive.domain.board.Board;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
     private String id;
 
     @Column(nullable = false)
@@ -40,9 +42,11 @@ public class UserEntity implements UserDetails {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Board> createdBoards;
 
     @ManyToMany(mappedBy = "collaborators")
+    @JsonIgnore
     private List<Board> collaborativeBoards;
 
     public UserEntity(String name, String user, String email, String password, UserRole role) {
@@ -56,14 +60,14 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(role == UserRole.ADMIN) {
-            return List.of(() -> "ROLE_ADMIN");
-        } else if(role == UserRole.STAFF) {
-            return List.of(() -> "ROLE_STAFF");
-        } else if(role == UserRole.GUEST) {
-            return List.of(() -> "ROLE_GUEST");
+        if (role == UserRole.ADMIN) {
+            return List.of(() -> "SCOPE_ADMIN", () -> "SCOPE_STAFF", () -> "SCOPE_USER");
+        } else if (role == UserRole.STAFF) {
+            return List.of(() -> "SCOPE_STAFF", () -> "SCOPE_USER");
+        } else if (role == UserRole.GUEST) {
+            return List.of(() -> "SCOPE_GUEST");
         } else {
-            return List.of(() -> "ROLE_USER");
+            return List.of(() -> "SCOPE_USER");
         }
     }
 

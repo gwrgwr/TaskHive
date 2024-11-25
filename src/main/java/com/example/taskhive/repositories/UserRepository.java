@@ -4,8 +4,10 @@ import com.example.taskhive.domain.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public interface UserRepository extends JpaRepository<UserEntity, String> {
-    UserDetails findUsersByUser(String user);
+import java.util.List;
+import java.util.Optional;
 
-    UserDetails findUsersByEmail(String email);
+public interface UserRepository extends JpaRepository<UserEntity, String> {
+
+    UserEntity findByUser(String user);
 }

@@ -10,4 +10,6 @@ public interface BoardRepository extends JpaRepository<Board, String> {
     List<Board> findAllByCreatedBy_Id(String createdById);
 
     List<Board> findByCollaborators_Id(String collaboratorId);
+
+    Board findByAccessCode(String accessCode);
 }

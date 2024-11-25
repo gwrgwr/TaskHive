@@ -1,4 +1,13 @@
 spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 2MB
   datasource:
     username: postgres
     password: mullen2906
@@ -10,6 +19,5 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-taskhive:
-  jwt:
-    secret: ${JWT_SECRET:secret}
+jwt.public.key: classpath:app.pub
+jwt.private.key: classpath:app.key

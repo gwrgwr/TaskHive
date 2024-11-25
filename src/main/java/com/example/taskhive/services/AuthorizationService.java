@@ -1,75 +1,49 @@
 package com.example.taskhive.services;
 
-import com.example.taskhive.config.security.TokenService;
-import com.example.taskhive.domain.user.*;
+import com.example.taskhive.domain.user.LoginRequestDTO;
+import com.example.taskhive.domain.user.LoginResponseDTO;
+import com.example.taskhive.domain.user.UserEntity;
+import com.example.taskhive.exceptions.user.UserNotFoundException;
 import com.example.taskhive.repositories.UserRepository;
-import jakarta.annotation.PostConstruct;
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
-public class AuthorizationService implements UserDetailsService {
+public class AuthorizationService {
 
-    private final UserRepository userRepository;
     private final TokenService tokenService;
-    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthorizationService(UserRepository userRepository, TokenService tokenService, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
+    public AuthorizationService(TokenService tokenService, UserService userService, BCryptPasswordEncoder passwordEncoder) {
         this.tokenService = tokenService;
-        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUsersByUser(username);
-    }
-
-    public LoginResponseDTO login(LoginAuthenticationDTO data) {
-        UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(data.user(), data.password());
-        Authentication auth = authenticationManager.authenticate(usernamePassword);
-        String token = tokenService.generateToken((UserEntity) auth.getPrincipal());
-        UserEntity user = (UserEntity) auth.getPrincipal();
-        return new LoginResponseDTO(token, user.getId(), user.getName(), user.getEmail(), user.getRole().toString());
-    }
-
-    public RegisterResponseDTO registerAdmin(RegisterAuthenticationDTO data) throws BadRequestException {
-        if (userRepository.findUsersByUser(data.user()) != null) {
-            throw new BadRequestException();
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
+        var user = userService.getUserByNameEntity(loginRequestDTO.user());
+        if (user == null || !passwordEncoder.matches(loginRequestDTO.password(), user.getPassword())) {
+            throw new UserNotFoundException();
         }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserEntity user = new UserEntity(data.name(), data.user(), data.email(), encryptedPassword, UserRole.ADMIN);
-        this.userRepository.save(user);
-        return new RegisterResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole().toString());
-    }
 
-    public RegisterResponseDTO register(RegisterAuthenticationDTO data) throws BadRequestException {
-        if (userRepository.findUsersByUser(data.user()) != null && userRepository.findUsersByEmail(data.email()) != null) {
-            throw new BadRequestException("Invalid Role");
-        }
-        UserRole role;
-        try {
-            role = UserRole.valueOf(data.role().toUpperCase());
-            if (role == UserRole.ADMIN) {
-                throw new BadRequestException("Invalid Role");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid Role");
-        }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserEntity user = new UserEntity(data.name(), data.user(), data.email(), encryptedPassword, role);
-        this.userRepository.save(user);
-        return new RegisterResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole().toString());
+        String token = tokenService.generateToken(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                AuthorityUtils.createAuthorityList(user.getRole().name())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new LoginResponseDTO(token, user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
 }
