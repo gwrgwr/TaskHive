@@ -1,6 +1,8 @@
 package com.example.taskhive.exceptions;
 
+import com.example.taskhive.exceptions.board.BoardAlreadyExistsException;
 import com.example.taskhive.exceptions.board.BoardNotFoundException;
+import com.example.taskhive.exceptions.file.FileNotFoundException;
 import com.example.taskhive.exceptions.global.InternalServerErrorException;
 import com.example.taskhive.exceptions.user.UserAlreadyExistsException;
 import com.example.taskhive.exceptions.user.UserNotFoundException;
@@ -41,5 +43,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InternalServerErrorException.class)
     private ResponseEntity<HttpResponseExceptionModel> internalServerError(InternalServerErrorException exception, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseExceptionModel(exception, request, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"));
+    }
+
+    @ExceptionHandler(BoardAlreadyExistsException.class)
+    private ResponseEntity<HttpResponseExceptionModel> boardAlreadyExist(BoardAlreadyExistsException exception, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponseExceptionModel(exception, request, HttpStatus.BAD_REQUEST, "Board Already Exist"));
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    private ResponseEntity<HttpResponseExceptionModel> fileNotFound(FileNotFoundException exception, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HttpResponseExceptionModel(exception, request, HttpStatus.NOT_FOUND, "File Not Found"));
     }
 }

@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/file")
 @Tag(name = "File", description = "File operations")
 public class FileDBController {
+//  ======================================= TODO refactor this code ======================================================
     private final FileDBService fileDBService;
 
     public FileDBController(FileDBService fileDBService) {
         this.fileDBService = fileDBService;
     }
-
     @PostMapping("/upload/")
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     public ResponseEntity<ResponseFileDTO> uploadFile(@RequestParam("file") MultipartFile file) {

@@ -22,6 +22,7 @@ public class Board {
     @Column(name = "board_id")
     private String id;
 
+    @Column(unique = true)
     private String name;
 
     private String description;

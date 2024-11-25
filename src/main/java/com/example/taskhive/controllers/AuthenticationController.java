@@ -21,7 +21,6 @@ public class AuthenticationController {
         this.authorizationService = authorizationService;
     }
 
-
     @PostMapping("/login")
     @LoginUserAnnotation
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {

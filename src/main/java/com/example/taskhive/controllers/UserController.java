@@ -1,5 +1,7 @@
 package com.example.taskhive.controllers;
 
+import com.example.taskhive.annotations.user.GetUserAnnotation;
+import com.example.taskhive.annotations.user.RegisterUserAnnotation;
 import com.example.taskhive.domain.user.*;
 import com.example.taskhive.services.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,29 +24,34 @@ public class UserController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @GetUserAnnotation
     public ResponseEntity<List<UserResponseDTO>> getUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @GetUserAnnotation
     public ResponseEntity<UserEntity> getUserById(@PathVariable String userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @GetMapping("/user/name/{userName}")
     @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @GetUserAnnotation
     public ResponseEntity<UserResponseDTO> getUserByName(@PathVariable String userName) {
         return ResponseEntity.ok(userService.getUserByName(userName));
     }
 
     @PostMapping("/register")
+    @RegisterUserAnnotation
     public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
         UserEntity user = this.userService.saveUser(registerRequestDTO);
         return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
     }
 
     @PostMapping("/register/admin")
+    @RegisterUserAnnotation
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<UserResponseDTO> registerAdmin(@RequestBody RegisterRequestDTO registerRequestDTO) {
         UserEntity user = this.userService.saveAdminUser(registerRequestDTO);
