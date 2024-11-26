@@ -1,5 +1,7 @@
 package com.example.taskhive.controllers;
 
+import com.example.taskhive.annotations.file.GetFileAnnotation;
+import com.example.taskhive.annotations.file.UploadFileAnnotation;
 import com.example.taskhive.domain.file.FileDB;
 import com.example.taskhive.domain.file.ResponseFileDTO;
 import com.example.taskhive.services.FileDBService;
@@ -19,13 +21,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/file")
 @Tag(name = "File", description = "File operations")
 public class FileDBController {
-//  ======================================= TODO refactor this code ======================================================
     private final FileDBService fileDBService;
 
     public FileDBController(FileDBService fileDBService) {
         this.fileDBService = fileDBService;
     }
     @PostMapping("/upload/")
+    @UploadFileAnnotation
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     public ResponseEntity<ResponseFileDTO> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
@@ -38,6 +40,7 @@ public class FileDBController {
     }
 
     @GetMapping("/files")
+    @GetFileAnnotation
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     public ResponseEntity<List<ResponseFileDTO>> getFiles() {
         List<ResponseFileDTO> files = fileDBService.getAllFiles().map(dbFile -> {
@@ -57,6 +60,7 @@ public class FileDBController {
     }
 
     @GetMapping("/files/{id}")
+    @GetFileAnnotation
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     public ResponseEntity<byte[]> getFile(@PathVariable String id) {
         FileDB fileDB = fileDBService.getFile(id);

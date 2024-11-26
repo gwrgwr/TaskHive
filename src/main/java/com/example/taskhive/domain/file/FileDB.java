@@ -1,7 +1,6 @@
 package com.example.taskhive.domain.file;
 
-import com.example.taskhive.domain.attach.Attachment;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.taskhive.domain.task.Task;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,9 +25,9 @@ public class FileDB {
     @Lob
     private byte[] data;
 
-//    @ManyToOne
-//    @JoinColumn(name = "attachment_id", nullable = false)
-//    private Attachment attachment;
+    @ManyToOne
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task task;
 
     public FileDB(String fileName, String contentType, byte[] bytes) {
         this.name = fileName;

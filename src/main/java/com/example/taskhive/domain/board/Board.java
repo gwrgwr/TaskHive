@@ -1,6 +1,6 @@
 package com.example.taskhive.domain.board;
 
-import com.example.taskhive.domain.list.Lists;
+import com.example.taskhive.domain.list.ListEntity;
 import com.example.taskhive.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,7 +42,7 @@ public class Board {
     private List<UserEntity> collaborators;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lists> lists;
+    private List<ListEntity> lists;
 
 
     private LocalDateTime createdAt;

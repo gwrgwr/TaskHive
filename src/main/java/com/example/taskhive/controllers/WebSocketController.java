@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 public class WebSocketController {
     @MessageMapping("/notification")
     @SendTo("/topic/notification")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
     public String sendNotification(String message) {
         return message;
     }

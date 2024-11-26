@@ -1,5 +1,6 @@
 package com.example.taskhive.annotations.board;
 
+import com.example.taskhive.domain.board.Board;
 import com.example.taskhive.domain.user.UserResponseDTO;
 import com.example.taskhive.exceptions.HttpResponseExceptionModel;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,9 +18,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Operation(summary = "Get board", description = "Get board from application", method = "GET", requestBody = @RequestBody(content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))))
+@Operation(summary = "Get board", description = "Get board from application", method = "GET")
 @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Got Board", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "200", description = "Got Board", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Board.class))),
         @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponseExceptionModel.class)))
 })

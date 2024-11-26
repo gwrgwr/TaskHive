@@ -1,9 +1,9 @@
 package com.example.taskhive.services;
 
 import com.example.taskhive.domain.board.Board;
-import com.example.taskhive.domain.board.CreateRequestBoardDTO;
+import com.example.taskhive.domain.board.CreateBoardRequestDTO;
+import com.example.taskhive.domain.list.ListEntity;
 import com.example.taskhive.domain.user.UserEntity;
-import com.example.taskhive.exceptions.board.BoardAlreadyExistsException;
 import com.example.taskhive.exceptions.board.BoardNotFoundException;
 import com.example.taskhive.exceptions.user.UserNotFoundException;
 import com.example.taskhive.repositories.BoardRepository;
@@ -17,13 +17,11 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository repository;
-    private final UserRepository userRepository;
-    private final BoardRepository boardRepository;
+    private final UserService userService;
 
-    public BoardService(BoardRepository repository, UserRepository userRepository, BoardRepository boardRepository) {
+    public BoardService(BoardRepository repository, UserService userService) {
         this.repository = repository;
-        this.userRepository = userRepository;
-        this.boardRepository = boardRepository;
+        this.userService = userService;
     }
 
     public List<Board> getAllBoardsFromUser(String userId) {
@@ -42,36 +40,43 @@ public class BoardService {
         return repository.findById(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
-    public Board saveBoard(CreateRequestBoardDTO data) {
-        Board boardExists = boardRepository.findByName(data.name()).orElseThrow(BoardNotFoundException::new);
-        UserEntity user = userRepository.findById(data.createdBy()).orElseThrow();
-        Board board = new Board(data.name(), data.description(), user);
-        return repository.save(board);
+    public List<ListEntity> getListsFromBoard(String boardId) {
+        Board board = getBoardById(boardId);
+        return board.getLists();
     }
 
     public String generateAccessCode(String boardId) {
         SecureRandom secureRandom = new SecureRandom();
         int token = 10000000 + secureRandom.nextInt(90000000);
-        Board board = repository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        Board board = getBoardById(boardId);
+
         board.setAccessCode(String.valueOf(token).toUpperCase());
         repository.save(board);
         return String.valueOf(token).toUpperCase();
     }
 
+    public Board saveBoard(CreateBoardRequestDTO data) {
+        repository.findByName(data.name()).orElseThrow(BoardNotFoundException::new);
+        UserEntity user = userService.getUserById(data.createdBy());
+        Board board = new Board(data.name(), data.description(), user);
+        return repository.save(board);
+    }
+
     public void addCollaborator(String accessCode, String userId) {
         Board board = repository.findByAccessCode(accessCode).orElseThrow(BoardNotFoundException::new);
-        UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userService.getUserById(userId);
         board.getCollaborators().add(user);
         repository.save(board);
     }
+
     public void deleteBoard(String boardId) {
-        Board board = repository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        Board board = getBoardById(boardId);
         repository.delete(board);
     }
 
     public void deleteUserFromBoard(String boardId, String userId) {
-        Board board = repository.findById(boardId).orElseThrow(UserNotFoundException::new);
-        UserEntity user = userRepository.findById(userId).orElseThrow(BoardNotFoundException::new);
+        Board board = getBoardById(boardId);
+        UserEntity user = userService.getUserById(userId);
         board.getCollaborators().remove(user);
         repository.save(board);
     }

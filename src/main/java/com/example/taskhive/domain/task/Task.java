@@ -1,12 +1,13 @@
 package com.example.taskhive.domain.task;
 
-import com.example.taskhive.domain.attach.Attachment;
-import com.example.taskhive.domain.list.Lists;
+import com.example.taskhive.domain.file.FileDB;
+import com.example.taskhive.domain.list.ListEntity;
 import com.example.taskhive.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
@@ -35,14 +37,25 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "list_id", nullable = false)
-    private Lists lists;
+    private ListEntity listEntity;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attachment> attachments;
+    private List<FileDB> files;
 
     private LocalDate dueDate;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    public Task(String title, String description, UserEntity assignee, ListEntity listEntity, LocalDate localDate) {
+        this.title = title;
+        this.description = description;
+        this.assignee = assignee;
+        this.listEntity = listEntity;
+        this.dueDate = localDate;
+        this.status = TaskStatus.TODO;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

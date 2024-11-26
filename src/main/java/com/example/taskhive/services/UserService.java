@@ -65,5 +65,4 @@ public class UserService {
     public void deleteUser(String userId) {
         repository.deleteById(userId);
     }
-
 }
