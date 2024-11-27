@@ -26,12 +26,12 @@ public class FileDBController {
     public FileDBController(FileDBService fileDBService) {
         this.fileDBService = fileDBService;
     }
-    @PostMapping("/upload/")
+    @PostMapping("/upload/{taskId}")
     @UploadFileAnnotation
     @PreAuthorize("hasAuthority('SCOPE_USER')")
-    public ResponseEntity<ResponseFileDTO> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseFileDTO> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable String taskId) {
         try {
-            fileDBService.store(file);
+            fileDBService.store(file, taskId);
 
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseFileDTO(file.getOriginalFilename(), file.getContentType(), file.getContentType(), file.getSize()));
         } catch (IOException e) {

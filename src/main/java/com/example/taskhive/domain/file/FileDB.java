@@ -29,9 +29,10 @@ public class FileDB {
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
-    public FileDB(String fileName, String contentType, byte[] bytes) {
+    public FileDB(String fileName, String contentType, byte[] bytes, Task task) {
         this.name = fileName;
         this.type = contentType;
         this.data = bytes;
+        this.task = task;
     }
 }

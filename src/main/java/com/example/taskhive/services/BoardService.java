@@ -4,6 +4,7 @@ import com.example.taskhive.domain.board.Board;
 import com.example.taskhive.domain.board.CreateBoardRequestDTO;
 import com.example.taskhive.domain.list.ListEntity;
 import com.example.taskhive.domain.user.UserEntity;
+import com.example.taskhive.exceptions.board.BoardAlreadyExistsException;
 import com.example.taskhive.exceptions.board.BoardNotFoundException;
 import com.example.taskhive.exceptions.user.UserNotFoundException;
 import com.example.taskhive.repositories.BoardRepository;
@@ -56,7 +57,9 @@ public class BoardService {
     }
 
     public Board saveBoard(CreateBoardRequestDTO data) {
-        repository.findByName(data.name()).orElseThrow(BoardNotFoundException::new);
+        if(repository.findByName(data.name()).isPresent()) {
+            throw new BoardAlreadyExistsException();
+        }
         UserEntity user = userService.getUserById(data.createdBy());
         Board board = new Board(data.name(), data.description(), user);
         return repository.save(board);

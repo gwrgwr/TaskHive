@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Operation(summary = "Get user", description = "Get user from application", method = "GET", requestBody = @RequestBody(content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))))
+@Operation(summary = "Get user", description = "Get user from application", method = "GET")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Got User", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponseExceptionModel.class)))
